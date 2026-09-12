@@ -153,7 +153,10 @@ function renderMarkdown(source) {
     list = [];
   };
   const inline = (text) => escapeHtml(text)
-    .replace(/\[([^\]]+)\]\(((?:https?:\/\/|\/)[^)]+)\)/g, '<a href="$2" rel="noopener">$1</a>')
+    .replace(/\[([^\]]+)\]\(((?:https?:\/\/|\/)[^)]+)\)/g, (match, label, href) => {
+      const external = /^https?:\/\//.test(href);
+      return `<a href="${href}"${external ? ' rel="nofollow noopener"' : ''}>${label}</a>`;
+    })
     .replace(/`([^`]+)`/g, '<code>$1</code>')
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
 

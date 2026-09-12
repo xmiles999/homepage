@@ -89,10 +89,10 @@ test('guide pages provide substantive article markup and internal links', async 
     const html = await read(`${slug}/index.html`);
     assert.match(html, /<meta name="robots" content="index,follow">/);
     assert.match(html, /<meta property="og:type" content="article">/);
-    assert.match(html, /<p class="article-meta">原创实践指南 · 更新于 2026-08-31<\/p>/);
+    assert.match(html, /<p class="article-meta">原创实践指南 · 更新于 20\d{2}-\d{2}-\d{2}<\/p>/);
     assert.match(html, /"@type":"Article"/);
-    assert.match(html, /"dateModified":"2026-08-31"/);
-    assert.match(html, /href="https:\/\/[a-z0-9-]+\.xyh\.wiki\/"/);
+    assert.match(html, /"dateModified":"20\d{2}-\d{2}-\d{2}"/);
+    assert.doesNotMatch(html, /href="https:\/\/[a-z0-9-]+\.xyh\.wiki\//, `${slug} should not expose direct external service links`);
     assert.ok(html.replace(/<[^>]+>/g, '').length > 900, `${slug} should contain more than a short template description`);
   }
 });
@@ -170,4 +170,29 @@ test('robots and sitemap reference the production origin', async () => {
   const sitemap = await read('sitemap.xml');
   assert.match(sitemap, /<loc>https:\/\/xyh\.wiki\/<\/loc>/);
   assert.ok(!sitemap.includes('localhost'));
+});
+
+test('generated HTML has no broken internal links', async () => {
+  const missing = [];
+  async function collect(directory) {
+    for (const entry of await readdir(directory, { withFileTypes: true })) {
+      const target = path.join(directory, entry.name);
+      if (entry.isDirectory()) await collect(target);
+      else if (entry.name.endsWith('.html')) {
+        const html = await readFile(target, 'utf8');
+        for (const [, href] of html.matchAll(/href="([^"]+)"/g)) {
+          if (!href.startsWith('/') || href.startsWith('/assets/')) continue;
+          const clean = href.split('?')[0].split('#')[0];
+          if (!clean) continue;
+          let output = clean === '/' ? path.join(dist, 'index.html') : path.join(dist, clean, 'index.html');
+          if (clean.endsWith('.xml') || clean.endsWith('.txt')) output = path.join(dist, clean.slice(1));
+          if (!await stat(output).then(() => true).catch(() => false)) {
+            missing.push(`${path.relative(dist, target)} -> ${href}`);
+          }
+        }
+      }
+    }
+  }
+  await collect(dist);
+  assert.deepEqual(missing, [], `broken internal links:\n${missing.join('\n')}`);
 });

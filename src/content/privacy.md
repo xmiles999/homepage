@@ -16,7 +16,7 @@
 
 广告是否个性化以及是否需要先征得同意，由 Google AdSense 配置、访问者所在地区和适用要求共同决定。浏览器的 Cookie、隐私和广告设置可能影响广告加载与个性化。广告内容和广告落地页由第三方提供，打开前请自行判断。
 
-你可以通过 [Google 广告设置](https://adssettings.google.com/) 管理 Google 广告个性化选项，也可以通过 [YourAdChoices](https://www.aboutads.info/choices/) 了解或退出部分参与方的个性化广告。页面页脚的“隐私设置”入口可在 Google Privacy & Messaging 已发布时撤回或修改此前的同意选择。
+你可以在 Google 广告设置（adssettings.google.com）中管理 Google 广告个性化选项，也可以在 YourAdChoices（aboutads.info/choices）中了解或退出部分参与方的个性化广告。页面页脚的“隐私设置”入口可在 Google Privacy & Messaging 已发布时撤回或修改此前的同意选择。
 
 ## 子域名和外部链接
 
